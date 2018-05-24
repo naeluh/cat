@@ -1,0 +1,233 @@
+
+html { 
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  line-height: 1;
+  background-color: rgb(255, 255, 255) ;
+  height: 100%;
+}
+
+#screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    
+    
+}
+
+.twitter-share-button {
+vertical-align: text-bottom;
+width: 70px;
+}
+
+img.bg {
+
+	position: fixed;
+	top: 0;
+	left: 0;	
+	width: 1460px;
+	background-color: rgb(255, 255, 255) ; opacity: 0.5;
+	
+	
+}
+
+.italic{ 
+  font-style: italic; 
+  font-size: 20px;
+  letter-spacing:1.2px;
+  font-family:"Times New Roman", Times, serif;
+  font-weight:bold;
+  text-shadow: 2px 2px 0px rgba(255,255,255,1);
+  margin-bottom: 10px;
+}
+
+
+
+a {
+  text-decoration: none;
+  color: #000;
+  background-color: none;
+  text-shadow: -2px 2px 0px rgba(255,255,255,1);
+ 
+ 
+}
+
+a:hover {
+  text-decoration: none;
+  color: #000000;
+  text-shadow: -2px 2px 0px rgba(255,255,255,1);
+  background-color: rgba(255,255,255,0.7);
+  
+}
+
+
+
+pre {
+  font-family: monaco, monospace;
+  font-size: 0.8em;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  padding: 5px 10px;
+  overflow: auto;
+}
+
+
+code {
+  font-family: monaco, monospace;
+}
+
+
+
+
+div.context {
+  position: absolute;
+  top: 5px;
+  left: 0px;
+  width: 230px;
+  padding: 14px 5px 12px 5px;
+  margin: 0;
+  background-color: rgba(255, 255, 255, 0);
+  border: none;
+  z-index: 1000;
+  text-align: center;
+  transform: translateZ(1000px);
+  -webkit-transform: translateZ(1000px);
+  -moz-transform: translateZ(1000px);
+  -ms-transform: translateZ(1000px);
+  -o-transform: translateZ(1000px);
+}
+
+div.context.dark {
+  color: white;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #777;
+}
+/* line 25, ../scss/minimal.scss */
+div.context.dark a {
+  color: #f08080;
+}
+/* line 29, ../scss/minimal.scss */
+div.context.dark a:hover {
+  color: white;
+}
+/* line 34, ../scss/minimal.scss */
+div.context strong {
+  font-weight: bold;
+}
+/* line 38, ../scss/minimal.scss */
+div.context p.description {
+  
+   
+  }
+  
+
+/* line 42, ../scss/minimal.scss */
+
+div.context p.header {
+  font-size: 24px;
+  color:#000;
+  letter-spacing: .09em;
+  
+  text-shadow: 0px 2px 0px rgba(255,255,255,1);
+  font-style: italic;
+  font-weight: bold;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  text-align: center;
+  margin-bottom: 0px;
+}
+
+
+div.context p.headersmall {
+
+  font-size: 11px;
+  color:#000000;
+  letter-spacing: .1em;
+  font-weight: bold;
+  font-family: Times, serif;
+  
+  text-align: center;
+
+  margin-bottom: 5px;
+}
+
+div.context div.social {
+
+}
+
+.sosh {
+  padding: 0px 0px 10px 2px;
+  margin-right: -25px;
+  opacity: 1;
+}
+  
+ 
+
+div.context p.description {
+  font-size: 11px;
+  padding: 0px 5px 0px 5px;
+  color:#000;
+  letter-spacing: 0px;
+  line-height:19px;
+  font-family: Monaco, Sans-serif;
+  text-align: center;
+}
+/* line 48, ../scss/minimal.scss */
+div.context.less p.description {
+  display: none;
+}
+
+div.context div.wobble {
+
+}
+
+
+
+div.context a.context-control {
+  display: inline;
+  background-color: none;
+  margin-top: 0px;
+  text-align: center;
+  text-transform:lowercase;
+  font-size: 0.94em;
+  font-style: italic;
+  font-family: Times, 'Times New Roman', serif;
+  width: 100px;
+  border-radius: 0px;
+  
+  cursor: pointer;
+}
+
+
+
+
+
+#embed { 
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5);
+  z-index: 6;
+  display: none;
+}
+#embed textarea { 
+  position: absolute;
+  top: 40%;
+  left: 45%;
+  width: 300px;
+  height: 90px;
+  word-break: break-word;
+  margin-left: -150px;
+  
+  font: 13px Geneva, Arial, Sans-serif;
+  padding: 22px;
+}
+
+

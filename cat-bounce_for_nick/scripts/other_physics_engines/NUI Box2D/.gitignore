@@ -1,0 +1,6 @@
+.Icon
+.DS_Store
+src/node_modules
+src/platforms
+src/plugins
+private
