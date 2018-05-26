@@ -1,4 +1,5 @@
 <template>
+  <!-- threejs dev branch -->
   <div ref="container" id="container"></div>
 </template>
 
