@@ -52,9 +52,11 @@ export default {
       })
       // resize events
       window.addEventListener('resize', () => {
-        console.log(window.innerHeight)
+        console.log(this)
+        this.$refs.viewport.height = window.innerHeight
+        this.$refs.viewport.width = window.innerWidth
         // as of 0.7.0 the renderer will auto resize... so we just take the values from the renderer
-        viewportBounds = Physics.aabb(0, 0, renderer.width, window.innerHeight)
+        viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
         // update the boundaries
         edgeBounce.setAABB(viewportBounds)
       }, true)
