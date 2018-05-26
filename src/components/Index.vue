@@ -1,6 +1,6 @@
 <template>
-  <!-- threejs dev branch -->
-  <div ref="container" id="container"></div>
+  <!-- PhysicsJS dev branch -->
+  <canvas ref="viewport" id="viewport"></canvas>
 </template>
 
 <script>
@@ -13,8 +13,25 @@ export default {
     return {}
   },
   methods: {},
-  mounted () {
+  computed: {
+    el () {
+      return this.$refs.viewport
+    }
+  },
+  created () {
+    console.log(Physics)
     console.log(Physics.world)
+    Physics(function (world) {
+      console.log(world)
+    })
+  },
+  mounted () {
+    console.log(Physics(function (world) {}))
+    console.log(Physics.world)
+    console.log(this.el)
+    Physics(function (world) {
+      console.log(world)
+    })
   }
 }
 </script>
