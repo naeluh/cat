@@ -5,6 +5,7 @@
 
 <script>
 import Physics from '../../node_modules/physicsjs/dist/physicsjs-full.min.js'
+import * as paper from 'paper'
 
 export default {
   name: 'Index',
@@ -18,7 +19,9 @@ export default {
       return this.$refs.viewport
     }
   },
-  created () {},
+  created () {
+    console.log(paper)
+  },
   mounted () {
     // console.log(Physics(function (world) {}))
     // console.log(Physics.world)
