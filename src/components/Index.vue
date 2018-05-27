@@ -41,9 +41,12 @@ const Ball = function (point, vector) {
     transformContent: false,
     position: this.point
   })
+  console.log(vector.y)
 }
 Ball.prototype.iterate = function () {
-  const size = this.paper.view.size
+  const self = this
+  const size = paper.view.size
+  console.log(self.radius)
   this.vector.y += this.gravity
   this.vector.x *= 0.99
   const pre = this.point + this.vector
@@ -70,82 +73,10 @@ export default {
       paper: null,
       dampen: 0.4,
       gravity: 3,
-      bounce: -0.6,
-      vector: 0
+      bounce: -0.6
     }
   },
-  methods: {
-    /*
-    Ball: function (point, vector) {
-      if (!vector || vector.isZero()) {
-        this.vector = paper.Point.random() * 5
-      } else {
-        this.vector = vector * 2
-      }
-      this.point = point
-      this.dampen = 0.4
-      this.gravity = 3
-      this.bounce = -0.6
-      const color = {
-        hue: Math.random() * 360,
-        saturation: 1,
-        brightness: 1
-      }
-      const gradient = new paper.Gradient([color, 'black'], true)
-      const radius = this.radius = 50 * Math.random() + 30
-      // Wrap CompoundPath in a Group, since CompoundPaths directly
-      // applies the transformations to the content, just like Path.
-      const ball = new paper.CompoundPath({
-        children: [
-          new paper.Path.Circle({
-            radius
-          }),
-          new paper.Path.Circle({
-            center: radius / 8,
-            radius: radius / 3
-          })
-        ],
-        fillColor: new paper.Color(gradient, 0, radius, radius / 8)
-      })
-      this.item = new paper.Group({
-        children: [ball],
-        transformContent: false,
-        position: this.point
-      })
-      // console.log(this.radius)
-      // this.paper.view.draw()
-      const object = {
-        'this': this,
-        'vector': vector,
-        'gravity': this.gravity,
-        'ball': ball,
-        'bounce': this.bounce,
-        'item': this.item,
-        'point': this.point
-      }
-      return object
-    },
-    iterate (ball, self) {
-      // console.log(ball.vector)
-      const size = this.paper.view.size
-      ball.vector.y += ball.gravity
-      ball.vector.x *= 0.99
-      const pre = ball.point + ball.vector
-      if (pre.x < ball.this.radius || pre.x > size.width - ball.this.radius) {
-        ball.vector.x *= -ball.this.dampen
-      }
-      if (pre.y < ball.this.radius || pre.y > size.height - ball.this.radius) {
-        if (Math.abs(ball.vector.x) < 3) {
-          ball.vector = paper.Point.random() * [150, 100] + [-75, 20]
-        }
-        ball.vector.y *= ball.bounce
-      }
-      const max = paper.Point.max(ball.this.radius, ball.point + ball.vector)
-      ball.item.position = ball.point = paper.Point.min(max, size - ball.this.radius)
-      ball.item.rotate(ball.vector.x)
-    }
-    */
-  },
+  methods: {},
   computed: {
     el () {
       return this.$refs.viewport
@@ -155,32 +86,37 @@ export default {
     // paper.install(window)
   },
   mounted () {
-    let self = this
+    const self = this
     this.paper = paper.setup(self.$refs.viewport)
-    let path = new paper.Path.Rectangle(new paper.Point(50, 25), new paper.Size(50, 50))
+    const path = new paper.Path.Rectangle(new paper.Point(50, 25), new paper.Size(50, 50))
     path.fillColor = 'black'
     for (let i = 0; i < 10; i++) {
-      let position = paper.Point.random()
-      let vector = paper.Point.random()
-      let ball = new Ball(position, vector)
+      // const position = paper.Point.random() * this.paper.view.size
+      const position = paper.Point.random()
+      // console.log(this.paper.view.size)
+      // const vector = (paper.Point.random() - [0.5, 0]) * [50, 100]
+      const vector = paper.Point.random()
+      const ball = new Ball(position, vector)
+      // console.log(ball.vector, vector)
       self.balls.push(ball)
     }
     this.paper.view.onMouseDrag = function (event) {
-      this.lastDelta = event.delta
+      self.lastDelta = event.delta
     }
     this.paper.view.onMouseUp = function (event) {
-      const ball = new Ball(event.point, this.lastDelta)
+      const ball = new Ball(event.point, self.lastDelta)
       self.balls.push(ball)
+      console.log(self.lastDelta)
       self.lastDelta = null
     }
     this.paper.view.onFrame = function (event) {
       path.rotate(3)
-      for (let i = 0, l = this.balls.length; i < l; i++) {
+      for (let i = 0, l = self.balls.length; i < l; i++) {
         // self.iterate(self.balls[i], self)
-        this.balls[i].iterate()
+        // self.balls[i].iterate()
       }
     }
-    // this.paper.view.draw()
+    this.paper.view.draw()
   }
 }
 </script>
