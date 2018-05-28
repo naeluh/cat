@@ -1,85 +1,23 @@
 <template>
-  <!-- paperjs  dev branch -->
-  <canvas ref="viewport" id="viewport" resize></canvas>
+  <!-- p5 dev branch -->
+  <div id="sketch" ref="sketch"></div>
 </template>
 
 <script>
-import * as paper from 'paper'
-const Ball = function (point, vector) {
-  if (!vector || vector.isZero()) {
-    this.vector = paper.Point.random() * 5
-  } else {
-    this.vector = vector * 2
-  }
-  this.point = point
-  this.dampen = 0.4
-  this.gravity = 3
-  this.bounce = -0.6
-  const color = {
-    hue: Math.random() * 360,
-    saturation: 1,
-    brightness: 1
-  }
-  const gradient = new paper.Gradient([color, 'black'], true)
-  const radius = this.radius = 50 * Math.random() + 30
-  // Wrap CompoundPath in a Group, since CompoundPaths directly
-  // applies the transformations to the content, just like Path.
-  const ball = new paper.CompoundPath({
-    children: [
-      new paper.Path.Circle({
-        radius: radius
-      }),
-      new paper.Path.Circle({
-        center: radius / 8,
-        radius: radius / 3
-      })
-    ],
-    fillColor: new paper.Color(gradient, 0, radius, radius / 8)
-  })
-  this.item = new paper.Group({
-    children: [ball],
-    transformContent: false,
-    position: this.point
-  })
-  console.log(vector.y)
-}
-Ball.prototype.iterate = function () {
-  const self = this
-  const size = paper.view.size
-  console.log(self.radius)
-  this.vector.y += this.gravity
-  this.vector.x *= 0.99
-  const pre = this.point + this.vector
-  if (pre.x < this.radius || pre.x > size.width - this.radius) {
-    this.vector.x *= -this.dampen
-  }
-  if (pre.y < this.radius || pre.y > size.height - this.radius) {
-    if (Math.abs(this.vector.x) < 3) {
-      this.vector = paper.Point.random() * [150, 100] + [-75, 20]
-    }
-    this.vector.y *= this.bounce
-  }
-  const max = paper.Point.max(this.radius, this.point + this.vector)
-  this.item.position = this.point = paper.Point.min(max, size - this.radius)
-  this.item.rotate(this.vector.x)
-}
+import P5 from 'p5/lib/p5.min'
+
 export default {
   name: 'Index',
   props: {},
   data: function () {
     return {
-      balls: [],
-      lastDelta: null,
-      paper: null,
-      dampen: 0.4,
-      gravity: 3,
-      bounce: -0.6
+      canvas: null
     }
   },
   methods: {},
   computed: {
     el () {
-      return this.$refs.viewport
+      return this.$refs.sketch
     }
   },
   created () {
@@ -87,36 +25,68 @@ export default {
   },
   mounted () {
     const self = this
-    this.paper = paper.setup(self.$refs.viewport)
-    const path = new paper.Path.Rectangle(new paper.Point(50, 25), new paper.Size(50, 50))
-    path.fillColor = 'black'
-    for (let i = 0; i < 10; i++) {
-      // const position = paper.Point.random() * this.paper.view.size
-      const position = paper.Point.random()
-      // console.log(this.paper.view.size)
-      // const vector = (paper.Point.random() - [0.5, 0]) * [50, 100]
-      const vector = paper.Point.random()
-      const ball = new Ball(position, vector)
-      // console.log(ball.vector, vector)
-      self.balls.push(ball)
-    }
-    this.paper.view.onMouseDrag = function (event) {
-      self.lastDelta = event.delta
-    }
-    this.paper.view.onMouseUp = function (event) {
-      const ball = new Ball(event.point, self.lastDelta)
-      self.balls.push(ball)
-      console.log(self.lastDelta)
-      self.lastDelta = null
-    }
-    this.paper.view.onFrame = function (event) {
-      path.rotate(3)
-      for (let i = 0, l = self.balls.length; i < l; i++) {
-        // self.iterate(self.balls[i], self)
-        // self.balls[i].iterate()
+    const myp5 = new P5(function (sketch) {
+      console.log(sketch)
+      /*
+      * @name Acceleration Ball Bounce
+      * @description Move an ellipse around based on accelerationX and accelerationY values, and bounces when touch the edge of the canvas.
+      */
+      // Position Variables
+      let x = 0
+      let y = 0
+      // Speed - Velocity
+      let vx = 250
+      let vy = 250
+      // Acceleration
+      let ax = 500
+      let ay = 500
+      const vMultiplier = 1
+      const bMultiplier = 0.9
+
+      sketch.setup = function () {
+        // console.log(self)
+        this.canvas = sketch.createCanvas(sketch.displayWidth, sketch.displayHeight)
+        this.canvas.parent(self.$refs.sketch)
+        sketch.fill(0)
       }
-    }
-    this.paper.view.draw()
+
+      sketch.draw = function () {
+        // console.log('draw')
+        sketch.background(255)
+        ballMove()
+        // console.log(x,y)
+        sketch.ellipse(x / 2, y / 2, 250, 250)
+        sketch.ellipse(x, y, 500, 500)
+      }
+
+      function ballMove () {
+        ax = sketch.accelerationX
+        ay = sketch.accelerationY
+        vx = vx + ay
+        vy = vy + ax
+        y = y + vy * vMultiplier
+        x = x + vx * vMultiplier
+        // Bounce when touch the edge of the canvas
+        if (x < 0) {
+          x = 0
+          vx = -vx * bMultiplier
+        }
+        if (y < 0) {
+          y = 0
+          vy = -vy * bMultiplier
+        }
+        if (x > sketch.width - 20) {
+          x = sketch.width - 20
+          vx = -vx * bMultiplier
+        }
+        if (y > sketch.height - 20) {
+          y = sketch.height - 20
+          vy = -vy * bMultiplier
+        }
+        // console.log(sketch.width)
+      }
+    })
+    console.log(myp5)
   }
 }
 </script>
