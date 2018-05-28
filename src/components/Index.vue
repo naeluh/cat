@@ -35,7 +35,7 @@ export default {
     let self = this
     const myp5 = new P5(function (sketch) {
       console.log(sketch)
-      let speed = 250
+      let speed = 10
       // Position Variables
       let x = 0
       let y = 0
@@ -69,6 +69,8 @@ export default {
         for (let i = 0; i < self.cats.length; i++) {
           const cat = self.cats[i]
           sketch.push()
+          sketch.imageMode(sketch.CENTER)
+          sketch.translate(x, y)
           ax = sketch.accelerationX
           ay = sketch.accelerationY
           vx = vx + ay
@@ -85,6 +87,7 @@ export default {
             vy = -vy * bMultiplier
           }
           if (x > sketch.width - 20) {
+            sketch.rotate(sketch.radians(sketch.frameCount))
             x = sketch.width - 20
             vx = -vx * bMultiplier
           }
@@ -92,10 +95,8 @@ export default {
             y = sketch.height - 20
             vy = -vy * bMultiplier
           }
-          sketch.imageMode(sketch.CENTER)
-          sketch.translate(x, y)
-          sketch.rotate(sketch.radians(sketch.frameCount / i))
-          sketch.image(cat, x, y, 100, 100)
+
+          sketch.image(cat, 0, 0, 0, 0)
           sketch.pop()
         }
       }
