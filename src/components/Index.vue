@@ -11,7 +11,15 @@ export default {
   props: {},
   data: function () {
     return {
-      canvas: null
+      canvas: null,
+      cats: [
+        require('@/assets/cat_1.png'),
+        require('@/assets/cat_2.png'),
+        require('@/assets/cat_3.png'),
+        require('@/assets/cat_4.png'),
+        require('@/assets/cat_5.png'),
+        require('@/assets/cat_6.png')
+      ]
     }
   },
   methods: {},
@@ -24,66 +32,72 @@ export default {
     // paper.install(window)
   },
   mounted () {
-    const self = this
+    let self = this
     const myp5 = new P5(function (sketch) {
       console.log(sketch)
-      /*
-      * @name Acceleration Ball Bounce
-      * @description Move an ellipse around based on accelerationX and accelerationY values, and bounces when touch the edge of the canvas.
-      */
+      let speed = 250
       // Position Variables
       let x = 0
       let y = 0
       // Speed - Velocity
-      let vx = 250
-      let vy = 250
+      let vx = speed
+      let vy = speed
       // Acceleration
-      let ax = 500
-      let ay = 500
-      const vMultiplier = 1
-      const bMultiplier = 0.9
+      let ax = speed
+      let ay = speed
+      // Multipliers
+      let vMultiplier = 0.07
+      let bMultiplier = 0.6
 
+      // Run p5 sketch
       sketch.setup = function () {
-        // console.log(self)
         this.canvas = sketch.createCanvas(sketch.displayWidth, sketch.displayHeight)
         this.canvas.parent(self.$refs.sketch)
-        sketch.fill(0)
+        for (let i = 0; i < self.cats.length; i++) {
+          const cat = self.cats[i]
+          self.cats[i] = sketch.loadImage(cat)
+        }
       }
 
       sketch.draw = function () {
-        // console.log('draw')
+        sketch.rectMode(sketch.CENTER)
         sketch.background(255)
-        ballMove()
-        // console.log(x,y)
-        sketch.ellipse(x / 2, y / 2, 250, 250)
-        sketch.ellipse(x, y, 500, 500)
+        catMove()
       }
 
-      function ballMove () {
-        ax = sketch.accelerationX
-        ay = sketch.accelerationY
-        vx = vx + ay
-        vy = vy + ax
-        y = y + vy * vMultiplier
-        x = x + vx * vMultiplier
-        // Bounce when touch the edge of the canvas
-        if (x < 0) {
-          x = 0
-          vx = -vx * bMultiplier
+      function catMove () {
+        for (let i = 0; i < self.cats.length; i++) {
+          const cat = self.cats[i]
+          sketch.push()
+          ax = sketch.accelerationX
+          ay = sketch.accelerationY
+          vx = vx + ay
+          vy = vy + ax
+          y = y + vy * vMultiplier
+          x = x + vx * vMultiplier
+          // Bounce when touch the edge of the canvas
+          if (x < 0) {
+            x = 0
+            vx = -vx * bMultiplier
+          }
+          if (y < 0) {
+            y = 0
+            vy = -vy * bMultiplier
+          }
+          if (x > sketch.width - 20) {
+            x = sketch.width - 20
+            vx = -vx * bMultiplier
+          }
+          if (y > sketch.height - 20) {
+            y = sketch.height - 20
+            vy = -vy * bMultiplier
+          }
+          sketch.imageMode(sketch.CENTER)
+          sketch.translate(x, y)
+          sketch.rotate(sketch.radians(sketch.frameCount / i))
+          sketch.image(cat, x, y, 100, 100)
+          sketch.pop()
         }
-        if (y < 0) {
-          y = 0
-          vy = -vy * bMultiplier
-        }
-        if (x > sketch.width - 20) {
-          x = sketch.width - 20
-          vx = -vx * bMultiplier
-        }
-        if (y > sketch.height - 20) {
-          y = sketch.height - 20
-          vy = -vy * bMultiplier
-        }
-        // console.log(sketch.width)
       }
     })
     console.log(myp5)
