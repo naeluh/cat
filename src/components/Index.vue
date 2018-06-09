@@ -35,42 +35,61 @@ export default {
     let self = this
     const myp5 = new P5(function (sketch) {
       console.log(sketch)
-      let speed = 10
+      // let speed = 100
       // Position Variables
-      let x = 0
-      let y = 0
+      // let x = 10
+      // let y = 10
+      let cat = ''
       // Speed - Velocity
-      let vx = speed
-      let vy = speed
+      // let vx = speed
+      // let vy = speed
       // Acceleration
-      let ax = speed
-      let ay = speed
+      // let ax = speed
+      // let ay = speed
       // Multipliers
-      let vMultiplier = 0.07
-      let bMultiplier = 0.6
+      // let vMultiplier = 0.07
+      // let bMultiplier = 0.6
 
       // Run p5 sketch
+      sketch.preload = function () {}
       sketch.setup = function () {
         this.canvas = sketch.createCanvas(sketch.displayWidth, sketch.displayHeight)
         this.canvas.parent(self.$refs.sketch)
-        for (let i = 0; i < self.cats.length; i++) {
-          const cat = self.cats[i]
-          self.cats[i] = sketch.loadImage(cat)
-        }
+        cat = new Cat()
+        // self.cats[0] = sketch.loadImage(self.cats[0])
+        // for (let i = 0; i < self.cats.length; i++) {
+        //  const cat = self.cats[i]
+        //  self.cats[i] = sketch.loadImage(cat)
+        // }
       }
-
       sketch.draw = function () {
         sketch.rectMode(sketch.CENTER)
         sketch.background(255)
-        catMove()
+        cat.display()
+        // console.log(cat.display())
+        // catMove()
       }
-
+      function Cat () {
+        console.log(self.cats[0])
+        let img = sketch.loadImage(self.cats[0])
+        // sketch.push()
+        // sketch.imageMode(sketch.CENTER)
+        // sketch.translate(x, y)
+        // sketch.image(self.cats[0], 0, 0, x, y)
+        // sketch.pop()
+        this.display = function () {
+          sketch.imageMode(sketch.CENTER)
+          sketch.image(img, sketch.displayWidth / 2, sketch.displayHeight / 2, 0, 0)
+        // for (let i = 0; i < self.cats.length; i++) {
+          // console.log('here')
+        }
+        // }
+      }
+      /*
       function catMove () {
         for (let i = 0; i < self.cats.length; i++) {
           const cat = self.cats[i]
           sketch.push()
-          sketch.imageMode(sketch.CENTER)
-          sketch.translate(x, y)
           ax = sketch.accelerationX
           ay = sketch.accelerationY
           vx = vx + ay
@@ -87,7 +106,7 @@ export default {
             vy = -vy * bMultiplier
           }
           if (x > sketch.width - 20) {
-            sketch.rotate(sketch.radians(sketch.frameCount))
+            sketch.rotate(0)
             x = sketch.width - 20
             vx = -vx * bMultiplier
           }
@@ -95,11 +114,14 @@ export default {
             y = sketch.height - 20
             vy = -vy * bMultiplier
           }
-
+          sketch.imageMode(sketch.CENTER)
+          sketch.translate(x, y / i)
+          sketch.rotate(sketch.radians(sketch.frameCount))
           sketch.image(cat, 0, 0, 0, 0)
           sketch.pop()
         }
       }
+      */
     })
     console.log(myp5)
   }
