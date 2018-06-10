@@ -20,11 +20,11 @@ export default {
         require('@/assets/cat_5.png'),
         require('@/assets/cat_6.png')
       ],
-      numBalls: 6,
+      numcatz: 6,
       spring: 0.001,
       gravity: 1.1,
       friction: -1,
-      balls: [],
+      catz: [],
       rotation: 0
     }
   },
@@ -47,35 +47,35 @@ export default {
         this.canvas = sketch.createCanvas(sketch.displayWidth, sketch.displayHeight)
         this.canvas.parent(self.$refs.sketch)
         for (let i = 0; i < self.cats.length; i++) {
-          self.balls[i] = new Ball(
+          self.catz[i] = new Cat(
             sketch.random(sketch.width),
             sketch.random(sketch.height),
             sketch.random(100, 200),
             i,
-            self.balls
+            self.catz
           )
         }
         sketch.noStroke()
       }
       sketch.draw = function () {
         sketch.background(255)
-        self.balls.forEach(ball => {
-          ball.collide()
-          ball.movin()
-          ball.display()
+        self.catz.forEach(cat => {
+          cat.collide()
+          cat.movin()
+          cat.display()
         })
       }
       sketch.mousePressed = function () {
-        self.balls.forEach(ball => {
-          ball.pressed()
+        self.catz.forEach(cat => {
+          cat.pressed()
         })
       }
       sketch.mouseReleased = function () {
-        self.balls.forEach(ball => {
-          ball.released()
+        self.catz.forEach(cat => {
+          cat.released()
         })
       }
-      function Ball (xin, yin, din, idin, oin) {
+      function Cat (xin, yin, din, idin, oin) {
         this.x = (sketch.displayWidth / idin) - sketch.random(0, sketch.displayWidth)
         this.y = 0
         let vx = 0
@@ -148,7 +148,7 @@ export default {
           var disX = this.x - sketch.mouseX
           var disY = this.y - sketch.mouseY
           var dis = sketch.createVector(disX, disY)
-          console.log((dis.mag()))
+          // console.log((dis.mag()))
           if (dis.mag() < this.diameter / 2) {
             return true
           } else {
