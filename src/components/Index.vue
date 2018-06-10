@@ -21,7 +21,7 @@ export default {
         require('@/assets/cat_6.png')
       ],
       numcatz: 6,
-      spring: 0.001,
+      spring: 0.0001,
       gravity: 1.1,
       friction: -1,
       catz: [],
@@ -76,7 +76,7 @@ export default {
         })
       }
       function Cat (xin, yin, din, idin, oin) {
-        this.x = (sketch.displayWidth / idin) - sketch.random(0, sketch.displayWidth)
+        this.x = (sketch.displayWidth / idin) - sketch.random(0, sketch.PI)
         this.y = 0
         let vx = 0
         let vy = 0
@@ -90,7 +90,7 @@ export default {
         self.cats[idin] = sketch.loadImage(self.cats[idin])
 
         this.collide = function () {
-          for (let i = this.id + 1; i < self.cats.length; i++) {
+          for (let i = this.id; i < self.cats.length; i++) {
             // console.log(others[i])
             let dx = this.others[i].x - this.x
             let dy = this.others[i].y - this.y
@@ -121,25 +121,25 @@ export default {
             vy += self.gravity
             this.x += vx
             this.y += vy
-            // rx -= vx
-            // ry -= vy
+            rx += vx
+            ry += vy
             if (this.x + this.diameter / 2 > sketch.width) {
               this.x = sketch.width - this.diameter / 2
               vx *= self.friction
-              rx -= vx
+              // rx -= vx
             } else if (this.x - this.diameter / 2 < 0) {
               this.x = this.diameter / 2
               vx *= self.friction
-              rx -= vx
+              // rx -= vx
             }
             if (this.y + this.diameter / 2 > sketch.height) {
               this.y = sketch.height - this.diameter / 2
               vy *= self.friction
-              ry -= vy
+              // ry -= vy
             } else if (this.y - this.diameter / 2 < 0) {
               this.y = this.diameter / 2
               vy *= self.friction
-              ry -= vy
+              // ry -= vy
             }
           }
         }
@@ -172,7 +172,7 @@ export default {
         this.display = function () {
           sketch.push()
           // console.log(vy, vx)
-          self.rotation = sketch.atan2(ry--, rx--)
+          self.rotation = sketch.atan2(ry++, rx++)
           // onsole.log(ry, rx)
           // self.rotation = sketch.atan2((ry--), (rx--))
           sketch.angleMode(sketch.RADIANS)
