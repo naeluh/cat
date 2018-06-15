@@ -87,10 +87,15 @@ export default {
         this.others = oin
         this.over = false
         this.move = false
+        // float pos = 20.0 // Position
+        this.velx = 0.0
+        this.vely = 0.0
+        this.accel = 0
+        this.force = 0
         self.cats[idin] = sketch.loadImage(self.cats[idin])
 
         this.collide = function () {
-          for (let i = this.id; i < self.cats.length; i++) {
+          for (let i = this.id + 2; i < self.cats.length; i++) {
             // console.log(others[i])
             let dx = this.others[i].x - this.x
             let dy = this.others[i].y - this.y
@@ -113,7 +118,7 @@ export default {
           }
         }
         this.movin = function () {
-          if (this.overEvent() || this.move) {
+          if (this.move) {
             // console.log('hello')
             this.y = sketch.mouseY
             this.x = sketch.mouseX
@@ -142,6 +147,11 @@ export default {
               // ry -= vy
             }
           }
+          if ((this.overEvent() || this.move)) {
+            this.over = true
+          } else {
+            this.over = false
+          }
         }
         // Test to see if mouse is over this spring
         this.overEvent = function () {
@@ -150,6 +160,7 @@ export default {
           var dis = sketch.createVector(disX, disY)
           // console.log((dis.mag()))
           if (dis.mag() < this.diameter / 2) {
+            console.log('overEvent')
             return true
           } else {
             return false
@@ -166,8 +177,10 @@ export default {
         this.released = function () {
           console.log('released')
           this.move = false
-          this.rest_posx = this.x
-          this.rest_posy = this.y
+          vy += self.gravity
+          vx += self.gravity
+          this.x += vx
+          this.y += vy
         }
         this.display = function () {
           sketch.push()
