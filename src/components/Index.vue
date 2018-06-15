@@ -22,10 +22,16 @@ export default {
       ],
       numcatz: 6,
       spring: 0.0001,
-      gravity: 1.1,
-      friction: -1,
       catz: [],
-      rotation: 0
+      rotation: 0,
+      acceleration: 0.05,
+      drag: 0.975,
+      friction: 0.85,
+      gravity: 0.5,
+      numBalls: 15,
+      balls: [],
+      selectedBall: false,
+      ball: null
     }
   },
   methods: {},
@@ -41,160 +47,145 @@ export default {
     let self = this
     const myp5 = new P5(function (sketch) {
       console.log(sketch)
+      let rx = 0
+      let ry = 0
+      let i = null
+      let j = null
+      let mouseIsPressed = false
       // Run p5 sketch
+      sketch.mousePressed = function () {
+        mouseIsPressed = true
+      }
+      // Run p5 sketch
+      sketch.mouseReleased = function () {
+        mouseIsPressed = false
+      }
       sketch.preload = function () {}
       sketch.setup = function () {
         this.canvas = sketch.createCanvas(sketch.displayWidth, sketch.displayHeight)
         this.canvas.parent(self.$refs.sketch)
         for (let i = 0; i < self.cats.length; i++) {
-          self.catz[i] = new Cat(
-            sketch.random(sketch.width),
-            sketch.random(sketch.height),
-            sketch.random(100, 200),
-            i,
-            self.catz
-          )
+          let r = 5 + Math.round(sketch.random() * 35)
+          let x = r + Math.round(sketch.random() * (sketch.displayWidth - 2 * r))
+          let y = r + Math.round(sketch.random() * (sketch.displayHeight - 2 * r))
+          let c = sketch.color(40, 60, 160, 200)
+          self.catz.push(new Cat(x, y, r, c, i))
         }
         sketch.noStroke()
       }
       sketch.draw = function () {
-        sketch.background(255)
-        self.catz.forEach(cat => {
-          cat.collide()
-          cat.movin()
-          cat.display()
-        })
-      }
-      sketch.mousePressed = function () {
-        self.catz.forEach(cat => {
-          cat.pressed()
-        })
-      }
-      sketch.mouseReleased = function () {
-        self.catz.forEach(cat => {
-          cat.released()
-        })
-      }
-      function Cat (xin, yin, din, idin, oin) {
-        this.x = (sketch.displayWidth / idin) - sketch.random(0, sketch.PI)
-        this.y = 0
-        let vx = 0
-        let vy = 0
-        let rx = 0
-        let ry = 0
-        this.diameter = din
-        this.id = idin
-        this.others = oin
-        this.over = false
-        this.move = false
-        // float pos = 20.0 // Position
-        this.velx = 0.0
-        this.vely = 0.0
-        this.accel = 0
-        this.force = 0
-        self.cats[idin] = sketch.loadImage(self.cats[idin])
+        // console.log(self.catz)
+        sketch.background(0)
+        // Draw balls
+        for (i = 0; i < self.catz.length; i++) {
+          let cat = self.catz[i]
+          sketch.fill(cat.c)
+          sketch.ellipse(cat.x, cat.y, cat.r * 2, cat.r * 2)
+        }
+        // Calculate acceleration
+        for (i = 0; i < self.catz.length; i++) {
+          // self.catz[i].display()
+          if (self.catz[i] !== self.selectedBall) {
+            self.catz[i].dy += self.gravity
+          }
+          for (j = i; j < self.catz.length; j++) {
+            self.catz[i].collide(self.catz[j])
+          }
+        }
+        // Work out if any ball is dragged
+        if (mouseIsPressed) {
+          if (!self.selectedBall) {
+            for (i = 0; i < self.catz.length; i++) {
+              if (self.catz[i].selected()) {
+                self.selectedBall = self.catz[i]
+                break
+              }
+            }
+          } else {
+            // Throw ball
+            self.selectedBall.dx += (sketch.mouseX - self.selectedBall.x) * self.acceleration
+            self.selectedBall.dy += (sketch.mouseY - self.selectedBall.y) * self.acceleration
+          }
+        } else {
+          self.selectedBall = false
+        }
 
-        this.collide = function () {
-          for (let i = this.id + 2; i < self.cats.length; i++) {
-            // console.log(others[i])
-            let dx = this.others[i].x - this.x
-            let dy = this.others[i].y - this.y
-            let distance = sketch.sqrt(dx * dx + dy * dy)
-            let minDist = this.others[i].diameter / 2 + this.diameter / 2
-            // console.log(distance)
-            // console.log(minDist)
-            if (distance < minDist) {
-              // console.log("2")
-              let angle = sketch.atan2(dy, dx)
-              let targetX = this.x + sketch.cos(angle) * minDist
-              let targetY = this.y + sketch.sin(angle) * minDist
-              let ax = (targetX - this.others[i].x) * self.spring
-              let ay = (targetY - this.others[i].y) * self.spring
-              vx -= ax
-              vy -= ay
-              this.others[i].vx += ax
-              this.others[i].vy += ay
-            }
+        // Move balls
+        for (i = 0; i < self.catz.length; i++) {
+          let cat = self.catz[i]
+          cat.move()
+          cat.bounce()
+        }
+      }
+      function Cat (x, y, r, c, index) {
+        // console.log(index)
+        this.x = x
+        this.y = y
+        this.r = r
+        this.c = c
+        this.dx = 10 * (sketch.random() - 0.5)
+        this.dy = 10 * (sketch.random() - 0.5)
+        self.cats[index] = sketch.loadImage(self.cats[index])
+        // this.r = self.cats[index].width
+        // this.r = self.cats[index].width
+        // this.h = self.cats[index].height
+        // Move ball based on its velocity
+        this.move = function () {
+          this.dx *= self.drag
+          this.dy *= self.drag
+          this.x += this.dx
+          this.y += this.dy
+        }
+        // Bounce off walls
+        this.bounce = function () {
+          if (this.x < this.r) {
+            this.x = this.r
+            this.dx *= -self.friction
+          }
+          if (this.x > sketch.displayWidth - this.r) {
+            this.x = sketch.displayWidth - this.r
+            this.dx *= -self.friction
+          }
+          if (this.y < this.r) {
+            this.y = this.r
+            this.dy *= -self.friction
+          }
+          if (this.y > 400 - this.r) {
+            this.y = 400 - this.r
+            this.dy *= -self.friction
           }
         }
-        this.movin = function () {
-          if (this.move) {
-            // console.log('hello')
-            this.y = sketch.mouseY
-            this.x = sketch.mouseX
-          } else {
-            vy += self.gravity
-            this.x += vx
-            this.y += vy
-            rx += vx
-            ry += vy
-            if (this.x + this.diameter / 2 > sketch.width) {
-              this.x = sketch.width - this.diameter / 2
-              vx *= self.friction
-              // rx -= vx
-            } else if (this.x - this.diameter / 2 < 0) {
-              this.x = this.diameter / 2
-              vx *= self.friction
-              // rx -= vx
-            }
-            if (this.y + this.diameter / 2 > sketch.height) {
-              this.y = sketch.height - this.diameter / 2
-              vy *= self.friction
-              // ry -= vy
-            } else if (this.y - this.diameter / 2 < 0) {
-              this.y = this.diameter / 2
-              vy *= self.friction
-              // ry -= vy
-            }
-          }
-          if ((this.overEvent() || this.move)) {
-            this.over = true
-          } else {
-            this.over = false
-          }
-        }
-        // Test to see if mouse is over this spring
-        this.overEvent = function () {
-          var disX = this.x - sketch.mouseX
-          var disY = this.y - sketch.mouseY
-          var dis = sketch.createVector(disX, disY)
-          // console.log((dis.mag()))
-          if (dis.mag() < this.diameter / 2) {
-            console.log('overEvent')
+        // Test whether mouse is over ball
+        this.selected = function () {
+          console.log(sketch.abs(sketch.mouseX - this.x), this.r)
+          if (sketch.abs(sketch.mouseX - this.x) < this.r && sketch.abs(sketch.mouseY - this.y) < this.r) {
             return true
-          } else {
-            return false
           }
         }
-        this.pressed = function () {
-          console.log('pressed')
-          if (this.over) {
-            this.move = true
-          } else {
-            this.move = false
+        this.collide = function (that) {
+          // console.log(that)
+          let dx = this.x - that.x
+          let dy = this.y - that.y
+          let dr = this.r + that.r
+
+          if (dx * dx + dy * dy < dr * dr) {
+            let theta = sketch.atan2(dy, dx)
+            let force = (dr - sketch.sqrt(dx * dx + dy * dy))
+            this.dx += force * sketch.cos(theta)
+            that.dx -= force * sketch.cos(theta)
+            this.dy += force * sketch.sin(theta)
+            that.dy -= force * sketch.sin(theta)
           }
-        }
-        this.released = function () {
-          console.log('released')
-          this.move = false
-          vy += self.gravity
-          vx += self.gravity
-          this.x += vx
-          this.y += vy
         }
         this.display = function () {
           sketch.push()
-          // console.log(vy, vx)
           self.rotation = sketch.atan2(ry++, rx++)
-          // onsole.log(ry, rx)
-          // self.rotation = sketch.atan2((ry--), (rx--))
           sketch.angleMode(sketch.RADIANS)
           sketch.rectMode(sketch.CENTER)
           sketch.imageMode(sketch.CENTER)
           sketch.translate(this.x, this.y)
           sketch.rotate(0)
-          // sketch.rect(0, 0, this.diameter, this.diameter)
-          sketch.image(self.cats[idin], 0, 0, 0, 0)
+          sketch.image(self.cats[index], 0, 0, 0, 0)
           sketch.pop()
         }
       }
