@@ -40,29 +40,24 @@ export default {
       return this.$refs.sketch
     }
   },
-  created () {
-    // paper.install(window)
-  },
+  created () {},
   mounted () {
     let self = this
     const myp5 = new P5(function (sketch) {
-      // console.log(sketch)
-      let rx = 0
-      let ry = 0
       let i = null
       let j = null
       let color = null
       let mouseIsPressed = false
-      // Run p5 sketch
+      let isSlowing = false
       sketch.mousePressed = function () {
         mouseIsPressed = true
+        isSlowing = true
       }
-      // Run p5 sketch
       sketch.mouseReleased = function () {
         mouseIsPressed = false
       }
       sketch.windowResized = function () {
-        sketch.resizeCanvas(sketch.displayWidth, sketch.displayHeight)
+        sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight)
       }
       sketch.preload = function () {
         for (let i = 0; i < self.cats.length; i++) {
@@ -74,39 +69,36 @@ export default {
         }
       }
       sketch.setup = function () {
-        this.canvas = sketch.createCanvas(sketch.displayWidth, sketch.displayHeight)
+        console.log(window)
+        this.canvas = sketch.createCanvas(window.innerWidth, window.innerHeight)
         this.canvas.parent(self.$refs.sketch)
         sketch.noStroke()
       }
       sketch.draw = function () {
-        // console.log(self.catz)
         sketch.clear()
         sketch.background('rgba(255,255,255, 0.0)')
         // Draw Cats
         for (i = 0; i < self.catz.length; i++) {
           self.catz[i].display()
         }
-        // Calculate acceleration
         for (i = 0; i < self.catz.length; i++) {
           if (self.catz[i] !== self.selectedBall) {
             self.catz[i].dy += self.gravity
           }
           for (j = i; j < self.catz.length; j++) {
             self.catz[i].collide(self.catz[j])
+            self.catz[i].rotateCat(self.catz[j])
           }
         }
-        // Work out if any ball is dragged
         if (mouseIsPressed) {
           if (!self.selectedBall) {
             for (i = 0; i < self.catz.length; i++) {
               if (self.catz[i].selected()) {
                 self.selectedBall = self.catz[i]
-                console.log()
                 break
               }
             }
           } else {
-            // Throw ball
             self.selectedBall.dx = (sketch.mouseX - self.selectedBall.x)
             self.selectedBall.dy = (sketch.mouseY - self.selectedBall.y)
           }
@@ -124,62 +116,91 @@ export default {
         // sketch.clear()
       }
       function Cat (x, y, r, c, index) {
-        // console.log(index)
         this.x = x
         this.y = y
         this.r = r
         this.c = c
         this.dx = 10 * (sketch.random() - 0.5)
         this.dy = 10 * (sketch.random() - 0.5)
+        this.rotation = 0.01
+        this.rotationSpeed = 0.5
+        this.isSlowing = false
+        this.minSpeed = 0
+        this.maxSpeed = 0.05
+        this.rx = 0.05
+        this.ry = 0.05
         self.cats[index] = sketch.loadImage(self.cats[index])
-        // let color = sketch.get(sketch.mouseX, sketch.mouseY)
-        // this.r = self.cats[index].width
-        // console.log(self.cats[index].width)
-        // this.w = self.cats[index].width
-        // this.h = self.cats[index].height
-        // Move ball based on its velocity
+        this.rotateCat = function (that) {
+          if (isSlowing) {
+            this.rx *= self.drag
+            this.ry *= self.drag
+            this.rx -= self.acceleration * 10
+            this.ry -= self.acceleration * 10
+            if (this.rotation < this.minSpeed && this.rotation > 0) {
+              this.rotation = this.minSpeed
+              isSlowing = false
+            }
+          } else {
+            this.rx *= self.drag
+            this.ry *= self.drag
+            this.rx += 0.05
+            this.ry += 0.05
+            if (this.rotation < -this.maxSpeed && this.rotation > this.maxSpeed && this.rotation < 0) {
+              this.rotation = this.maxSpeed
+              isSlowing = true
+            } else {
+              this.rotation = sketch.atan2(this.ry, this.rx)
+            }
+          }
+        }
         this.move = function () {
           this.dx *= self.drag
           this.dy *= self.drag
           this.x += this.dx
           this.y += this.dy
         }
-        // Bounce off walls
         this.bounce = function () {
+          isSlowing = true
           if (this.x < this.r) {
             this.x = this.r
             this.dx *= -self.friction / 10
+            this.rx *= -self.friction
+            isSlowing = false
           }
           if (this.x > sketch.displayWidth - this.r) {
             this.x = sketch.displayWidth - this.r
             this.dx *= -self.friction / 10
+            this.rx *= -self.friction
+            isSlowing = false
           }
           if (this.y < this.r - sketch.displayHeight * 10) {
-            this.y = this.r
+            this.y = this.r - sketch.displayHeight * 10
             this.dy *= -self.friction / 10
+            this.ry *= -self.friction
+            isSlowing = false
           }
           if (this.y > sketch.displayHeight - self.cats[index].height + 90) {
             this.y = sketch.displayHeight - self.cats[index].height + 90
             this.dy *= -self.friction
+            this.ry *= -self.friction
+            isSlowing = true
           }
         }
-        // Test whether mouse is over ball
         this.selected = function () {
-          // console.log(sketch.get(sketch.mouseX, sketch.mouseY))
-          // console.log(color[0], color[1], color[2])
           if (sketch.abs(sketch.mouseX - this.x) < self.cats[index].width / 4 && sketch.abs(sketch.mouseY - this.y) < self.cats[index].height / 2) {
             if (color[0] !== 0 && color[1] !== 0 && color[2] !== 0) {
+              isSlowing = false
               return true
             }
           }
         }
         this.collide = function (that) {
-          // console.log(that)
           let dx = this.x - that.x
           let dy = this.y - that.y
           let dr = this.r + that.r
 
           if (dx * dx + dy * dy < dr * dr) {
+            isSlowing = false
             let theta = sketch.atan2(dy, dx)
             let force = (dr - sketch.sqrt(dx * dx + dy * dy))
             this.dx += force * sketch.cos(theta)
@@ -190,23 +211,18 @@ export default {
         }
         this.display = function () {
           sketch.push()
-          rx = this.dx
-          ry = this.dy
-          self.rotation = sketch.atan2(ry, rx)
           sketch.angleMode(sketch.RADIANS)
           sketch.rectMode(sketch.CENTER)
           sketch.imageMode(sketch.CENTER)
           sketch.translate(this.x, this.y)
-          sketch.rotate(0)
+          sketch.rotate(this.rx)
           sketch.image(self.cats[index], 0, 0, 0, 0)
-          // let c = sketch.get()
-          // sketch.image(c, 0, 0, 0, 0)
           sketch.pop()
         }
-        // console.log(self.cats[index])
       }
     })
     console.log(myp5)
+    console.log(window)
   }
 }
 </script>
@@ -214,9 +230,6 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 #sketch {
-  position: relative;
-  height: 100vh;
-  width: 100vw;
   background: -moz-linear-gradient(top,  rgba(239,49,249,1) 0%, rgba(125,185,232,0) 100%);
   background: -webkit-linear-gradient(top,  rgba(239,49,249,1) 0%,rgba(125,185,232,0) 100%);
   background: linear-gradient(to bottom,  rgba(239,49,249,1) 0%,rgba(125,185,232,0) 100%);
