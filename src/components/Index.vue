@@ -57,7 +57,7 @@ export default {
         mouseIsPressed = false
       }
       sketch.windowResized = function () {
-        sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight)
+        sketch.resizeCanvas(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio)
       }
       sketch.preload = function () {
         for (let i = 0; i < self.cats.length; i++) {
@@ -69,8 +69,8 @@ export default {
         }
       }
       sketch.setup = function () {
-        console.log(window)
-        this.canvas = sketch.createCanvas(window.innerWidth, window.innerHeight)
+        console.log(window.innerWidth)
+        this.canvas = sketch.createCanvas(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio)
         this.canvas.parent(self.$refs.sketch)
         sketch.noStroke()
       }
